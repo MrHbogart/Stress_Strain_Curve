@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-# In[32]:
+# In[2]:
 
 
 """i work with Santam Machine and the results are in .xls format
@@ -20,15 +20,13 @@ import math
     x for elongation and y for Force"""
 
 file_name = 'Fe.xls'
-sample_name = file_name[:-5]
 data = pd.read_excel(file_name)
 
 
 #measurments
-thickness = 3.96e-3
-width = 6.04e-3
+thickness = 3e-3
+width = 5.96e-3
 gage_length_s = 25e-3
-gage_length_f = 28.8e-3
 
 #preparing loaded pandas dataframe to extract x and y
 force = data['Unnamed: 1'][24:].reset_index().drop(['index'], axis=1)
@@ -41,7 +39,7 @@ x = data.values[:,1]
 y = data.values[:,0]
 
 
-# In[33]:
+# In[3]:
 
 
 def find_linear_point(x, y, threshold=0.00001):
@@ -78,10 +76,12 @@ plt.ylabel('Force (N)')
 plt.xlabel('Elongation with error (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
+plt.savefig('Fe_Elastic', dpi=200, transparent=False)
+
 plt.show()
 
 
-# In[34]:
+# In[4]:
 
 
 def frac_point(x, y):
@@ -93,11 +93,12 @@ def frac_point(x, y):
         return is index of frac point in data"""
     reversed_x = x[::-1]
     reversed_y = y[::-1]
+    
     point, point2, point3, mid_id, mid_range= find_linear_point(reversed_x, reversed_y)
 
     module = (reversed_y[mid_id + mid_range] - reversed_y[mid_id - mid_range])    /(reversed_x[mid_id + mid_range] - reversed_x[mid_id - mid_range])
 
-    b = point[1] - module*(point[0]-0.01)
+    b = point[1] - module*(point[0]-0.001)
 
     for i in range(len(reversed_x)):
         x1 = reversed_x[i]
@@ -105,13 +106,13 @@ def frac_point(x, y):
         y1 = reversed_y[i]
         y2 = reversed_y[i+1]
         if (y2-(module*x2 +b))*(y1-(module*x1+b)) < 0:
-            frac_index = i
+            frac_index = i+1
             break
 
     return len(x)-frac_index
 
 
-# In[35]:
+# In[5]:
 
 
 def unsteady(x, y):
@@ -130,16 +131,16 @@ def unsteady(x, y):
 x = x-unsteady(x, y)
 
 plt.plot(x, y)
-plt.title('Force-Elongation curve for Al sample')
+plt.title('Force-Elongation curve for Fe sample')
 plt.ylabel('Force (N)')
 plt.xlabel('Elongation (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Al_Force_Elongation', dpi=200, transparent=False)
+plt.savefig('Fe_removed_error', dpi=200, transparent=False)
 plt.show()
 
 
-# In[36]:
+# In[6]:
 
 
 #calculatin engeeniring strain and stress
@@ -151,16 +152,16 @@ print(f'fracture stress : {eng_stress[frac_index]:.2f} MPa and strain: {eng_stra
 
 plt.plot(eng_strain, eng_stress)
 plt.plot(eng_strain[frac_index], eng_stress[frac_index], "s")
-plt.title('Engeeniring Stress-Strain curve for Al sample')
+plt.title('Engeeniring Stress-Strain curve for Fe sample')
 plt.ylabel('eng-Stress (MPa)')
 plt.xlabel('Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Al_Eng_Stress_Strain', dpi=200, transparent=False)
+plt.savefig('Fe_eng_stress_strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[37]:
+# In[7]:
 
 
 #calculating True stress and strain data
@@ -177,17 +178,17 @@ true_strain = true_strain[:np.argmax(true_stress)]
 true_stress = true_stress[:np.argmax(true_stress)]
     
 plt.plot(true_strain, true_stress)
-plt.title('True Stress-Strain curve for Al sample')
+plt.title('True Stress-Strain curve for Fe sample')
 plt.ylabel('true-Stress (MPa)')
 plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
 
-# plt.savefig('Al_True_Stress_Strain', dpi=200, transparent=False)
+plt.savefig('Fe_True_Stress_Strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[38]:
+# In[8]:
 
 
 #calculating Module
@@ -220,16 +221,16 @@ for i in range(len(true_stress)):
 plt.plot(true_strain, true_stress)
 plt.plot(bxs, bys)
 plt.plot(yp_strain, yp_stress, "s")
-plt.title('True Stress-Strain curve for Al sample')
+plt.title('True Stress-Strain curve for Fe sample')
 plt.ylabel('true-Stress (MPa)')
 plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Al_True_Stress_Strain', dpi=200, transparent=False)
+plt.savefig('Fe_Yield_point', dpi=200, transparent=False)
 plt.show()
 
 
-# In[39]:
+# In[9]:
 
 
 #calculating maximum of stress in True stress-strain data
@@ -239,7 +240,7 @@ true_utstrain = true_strain[-1]
 # print(utstress, utstrain)
 
 
-# In[40]:
+# In[10]:
 
 
 #calculating maximum of stress and strain in engeeniring data to report as UTS
@@ -248,4 +249,3 @@ eng_utstress = eng_stress[eng_stress_maxarg]
 eng_utstrain = eng_strain[eng_stress_maxarg]
 
 print(f'Ultimate tensile stress : {eng_utstress:.2f} MPa and strain: {eng_utstrain:.2f}')
-
