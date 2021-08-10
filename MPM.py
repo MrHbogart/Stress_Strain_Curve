@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[16]:
 
 
 import pandas as pd
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-# In[2]:
+# In[17]:
 
 
 """i work with Santam Machine and the results are in .xls format
@@ -39,7 +39,7 @@ x = data.values[:,1]
 y = data.values[:,0]
 
 
-# In[3]:
+# In[18]:
 
 
 def find_linear_point(x, y, threshold=0.00001):
@@ -76,12 +76,12 @@ plt.ylabel('Force (N)')
 plt.xlabel('Elongation with error (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-plt.savefig('Fe_Elastic', dpi=200, transparent=False)
+# plt.savefig('Fe_Elastic', dpi=200, transparent=False)
 
 plt.show()
 
 
-# In[4]:
+# In[19]:
 
 
 def frac_point(x, y):
@@ -112,7 +112,7 @@ def frac_point(x, y):
     return len(x)-frac_index
 
 
-# In[5]:
+# In[20]:
 
 
 def unsteady(x, y):
@@ -136,11 +136,11 @@ plt.ylabel('Force (N)')
 plt.xlabel('Elongation (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-plt.savefig('Fe_removed_error', dpi=200, transparent=False)
+# plt.savefig('Fe_removed_error', dpi=200, transparent=False)
 plt.show()
 
 
-# In[6]:
+# In[21]:
 
 
 #calculatin engeeniring strain and stress
@@ -148,7 +148,6 @@ eng_strain = (x*1e-3) / gage_length_s
 eng_stress = (y / (thickness * width))*1e-6
 
 frac_index = frac_point(x, y)
-print(f'fracture stress : {eng_stress[frac_index]:.2f} MPa and strain: {eng_strain[frac_index]:4f}')
 
 plt.plot(eng_strain, eng_stress)
 plt.plot(eng_strain[frac_index], eng_stress[frac_index], "s")
@@ -157,11 +156,11 @@ plt.ylabel('eng-Stress (MPa)')
 plt.xlabel('Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-plt.savefig('Fe_eng_stress_strain', dpi=200, transparent=False)
+# plt.savefig('Fe_eng_stress_strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[7]:
+# In[22]:
 
 
 #calculating True stress and strain data
@@ -184,17 +183,16 @@ plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
 
-plt.savefig('Fe_True_Stress_Strain', dpi=200, transparent=False)
+# plt.savefig('Fe_True_Stress_Strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[8]:
+# In[23]:
 
 
 #calculating Module
 module = (true_stress[mid_id + mid_range] - true_stress[mid_id - mid_range])/(true_strain[mid_id + mid_range] - true_strain[mid_id - mid_range])
 
-print(f'Module: {module:.2f} MPa')
 
 #to find yield point
 #y = ax + b, for parallel line we need : if y=0 ==> x=0.002, so module*0.002 = -b
@@ -226,21 +224,22 @@ plt.ylabel('true-Stress (MPa)')
 plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-plt.savefig('Fe_Yield_point', dpi=200, transparent=False)
+# plt.savefig('Fe_Yield_point', dpi=200, transparent=False)
 plt.show()
 
 
-# In[9]:
+# In[26]:
+
+
+#printing module
+print(f'Module: {module:.2f} MPa')
+
+
 
 
 #calculating maximum of stress in True stress-strain data
 true_utstress = true_stress[-1]
 true_utstrain = true_strain[-1]
-
-# print(utstress, utstrain)
-
-
-# In[10]:
 
 
 #calculating maximum of stress and strain in engeeniring data to report as UTS
@@ -248,4 +247,29 @@ eng_stress_maxarg = np.argmax(eng_stress)
 eng_utstress = eng_stress[eng_stress_maxarg]
 eng_utstrain = eng_strain[eng_stress_maxarg]
 
-print(f'Ultimate tensile stress : {eng_utstress:.2f} MPa and strain: {eng_utstrain:.2f}')
+#maximum force
+uts_force = y.max()
+
+print(f'Ultimate tensile eng-stress : {eng_utstress:.2f} MPa and eng-strain: {eng_utstrain:.2f}')
+print(f'Ultimate tensile True-stress : {true_utstress:.2f} MPa and True-strain: {true_utstrain:.2f}')
+print(f'Ultimate Force : {uts_force:.2f}')
+
+
+# In[27]:
+
+
+#Fracture engineering stress and strain
+eng_frstress = eng_stress[frac_index]
+eng_frstrain = eng_strain[frac_index]
+
+#Fracture force
+fr_force = y[frac_index]
+
+print(f'Fracture tensile eng-stress : {eng_frstress:.2f} MPa and eng-strain: {eng_frstrain:.2f}')
+print(f'Fracture Force : {fr_force:.2f}')
+
+
+# In[ ]:
+
+
+
