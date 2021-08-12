@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[16]:
+# In[1]:
 
 
 import pandas as pd
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-# In[17]:
+# In[2]:
 
 
 """i work with Santam Machine and the results are in .xls format
@@ -19,13 +19,13 @@ import math
     after loading your data, we should have two numpy array
     x for elongation and y for Force"""
 
-file_name = 'Fe.xls'
+file_name = 'Cu.xls'
 data = pd.read_excel(file_name)
 
 
 #measurments
-thickness = 3e-3
-width = 5.96e-3
+thickness = 2.9e-3
+width = 6.06e-3
 gage_length_s = 25e-3
 
 #preparing loaded pandas dataframe to extract x and y
@@ -39,7 +39,7 @@ x = data.values[:,1]
 y = data.values[:,0]
 
 
-# In[18]:
+# In[3]:
 
 
 def find_linear_point(x, y, threshold=0.00001):
@@ -76,12 +76,12 @@ plt.ylabel('Force (N)')
 plt.xlabel('Elongation with error (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Fe_Elastic', dpi=200, transparent=False)
+plt.savefig('Cu_Elastic', dpi=200, transparent=False)
 
 plt.show()
 
 
-# In[19]:
+# In[4]:
 
 
 def frac_point(x, y):
@@ -98,7 +98,7 @@ def frac_point(x, y):
 
     module = (reversed_y[mid_id + mid_range] - reversed_y[mid_id - mid_range])    /(reversed_x[mid_id + mid_range] - reversed_x[mid_id - mid_range])
 
-    b = point[1] - module*(point[0]-0.001)
+    b = point[1] - module*(point[0]-0.01)
 
     for i in range(len(reversed_x)):
         x1 = reversed_x[i]
@@ -112,7 +112,7 @@ def frac_point(x, y):
     return len(x)-frac_index
 
 
-# In[20]:
+# In[5]:
 
 
 def unsteady(x, y):
@@ -131,16 +131,16 @@ def unsteady(x, y):
 x = x-unsteady(x, y)
 
 plt.plot(x, y)
-plt.title('Force-Elongation curve for Fe sample')
+plt.title('Force-Elongation curve for Al sample')
 plt.ylabel('Force (N)')
 plt.xlabel('Elongation (mm)')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Fe_removed_error', dpi=200, transparent=False)
+plt.savefig('Cu_removed_error', dpi=200, transparent=False)
 plt.show()
 
 
-# In[21]:
+# In[6]:
 
 
 #calculatin engeeniring strain and stress
@@ -151,16 +151,16 @@ frac_index = frac_point(x, y)
 
 plt.plot(eng_strain, eng_stress)
 plt.plot(eng_strain[frac_index], eng_stress[frac_index], "s")
-plt.title('Engeeniring Stress-Strain curve for Fe sample')
+plt.title('Engeeniring Stress-Strain curve for Al sample')
 plt.ylabel('eng-Stress (MPa)')
 plt.xlabel('Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Fe_eng_stress_strain', dpi=200, transparent=False)
+plt.savefig('Cu_eng_stress_strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[22]:
+# In[7]:
 
 
 #calculating True stress and strain data
@@ -177,17 +177,17 @@ true_strain = true_strain[:np.argmax(true_stress)]
 true_stress = true_stress[:np.argmax(true_stress)]
     
 plt.plot(true_strain, true_stress)
-plt.title('True Stress-Strain curve for Fe sample')
+plt.title('True Stress-Strain curve for Al sample')
 plt.ylabel('true-Stress (MPa)')
 plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
 
-# plt.savefig('Fe_True_Stress_Strain', dpi=200, transparent=False)
+plt.savefig('Cu_True_Stress_Strain', dpi=200, transparent=False)
 plt.show()
 
 
-# In[23]:
+# In[8]:
 
 
 #calculating Module
@@ -219,22 +219,23 @@ for i in range(len(true_stress)):
 plt.plot(true_strain, true_stress)
 plt.plot(bxs, bys)
 plt.plot(yp_strain, yp_stress, "s")
-plt.title('True Stress-Strain curve for Fe sample')
+plt.title('True Stress-Strain curve for Al sample')
 plt.ylabel('true-Stress (MPa)')
 plt.xlabel('true-Strain')
 plt.grid(True)
 plt.axis([0, None, 0, None])
-# plt.savefig('Fe_Yield_point', dpi=200, transparent=False)
+plt.savefig('Cu_Yield_point', dpi=200, transparent=False)
 plt.show()
 
 
-# In[26]:
+# In[12]:
 
 
 #printing module
 print(f'Module: {module:.2f} MPa')
 
-
+#printing yield point styress and strain
+print(f'Yield point stress: {yp_stress:.2f} MPa and strain: {yp_strain:.2f}')
 
 
 #calculating maximum of stress in True stress-strain data
@@ -255,7 +256,7 @@ print(f'Ultimate tensile True-stress : {true_utstress:.2f} MPa and True-strain: 
 print(f'Ultimate Force : {uts_force:.2f}')
 
 
-# In[27]:
+# In[10]:
 
 
 #Fracture engineering stress and strain
